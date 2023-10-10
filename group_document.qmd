@@ -7,13 +7,33 @@ editor: visual
 
 # Fabian
 
-# Noy
+=======
+```{r}
+fabi <- sample(115:180, size = 1)
+print(fabi)
+print ("IQ")
+```
 
-# Pauline
+hi
 
-# Eva
-##New feature
+## Noy
+
+group 19 \<3
+
+#### New Feature
+
+Noy's new feature
+
+## Pauline
+
+### New analysis 
+
+bla bla bla 
+
+hello
+
+## Eva
+###New feature
 ```{r}
 print("Hello world")
 ```
-
