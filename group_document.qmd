@@ -7,6 +7,12 @@ editor: visual
 
 ## Fabian
 
+```{r}
+fabi <- sample(115:180, size = 1)
+print(fabi)
+print ("IQ")
+```
+
 ## Noy
 
 ## Pauline
