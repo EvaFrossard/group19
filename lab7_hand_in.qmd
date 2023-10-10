@@ -1,0 +1,164 @@
+---
+title: "lab06_exercises"
+author: "Eva Frossard"
+format: html
+editor: visual
+---
+# Load libraries
+
+```{r}
+library(tidyverse)
+library(broom)
+```
+
+# Load Data
+
+```{r}
+raw_dir <- "/home/people/s231701/projects/r_for_bio_data_science/data/_raw/"
+data_file <- "gravier.RData"
+data_loc <- "https://github.com/ramhiser/datamicroarray/raw/master/data/"
+
+if( !dir.exists(raw_dir) ){
+  dir.create(path = raw_dir)
+}
+if( !file.exists(str_c(raw_dir, data_file)) ){
+  download.file(
+    url = str_c(data_loc, data_file),
+    destfile = str_c(raw_dir, data_file))
+}
+load(file = str_c(raw_dir, data_file))
+```
+
+
+# Tidy the data
+## Clean Data
+
+```{r}
+gravier_clean <- gravier |>
+  bind_cols() |> # binds the two dataframes by columns
+  as_tibble()
+
+
+write_tsv(gravier_clean, 
+       file="/home/people/s231701/projects/r_for_bio_data_science/data/02_gravier_clean.tsv.gz"
+       )
+```
+
+## Augment Data
+
+
+```{r}
+gravier_clean_aug <- gravier_clean |>
+  mutate(y = case_when(y == "poor" ~ 1,
+                       y == "good" ~ 0)) |> 
+  relocate(early_metastasis = y)
+
+
+write_tsv(gravier_clean_aug, 
+       file="/home/people/s231701/projects/r_for_bio_data_science/data/03_gravier_clean_aug.tsv.gz"
+       )
+```
+
+## Analysis
+
+
+```{r}
+my_first_model <- lm(formula = g1A01 ~ early_metastasis,
+   data = gravier_clean_aug)
+
+
+```
+
+
+```{r}
+gravier_clean_aug_long <- gravier_clean_aug |> 
+  pivot_longer(
+    cols = starts_with("g"),
+    names_to = "genes",
+    values_to = "log2_expr_level"
+  )
+
+```
+```{r}
+gravier_clean_aug_long_nested <- gravier_clean_aug_long |> 
+  group_by(genes) |> 
+  nest() |> 
+  ungroup()
+
+```
+
+
+```{r}
+gravier_clean_aug_long_nested <- gravier_clean_aug_long_nested |> 
+  group_by(genes) |> 
+  mutate(
+    model_object = map(.x = data,
+                   .f = ~lm(formula = log2_expr_level ~ early_metastasis,
+                            data = .x))
+  )
+```
+
+## Tidying the models
+
+```{r}
+gravier_clean_aug_long_nested <- gravier_clean_aug_long_nested |> 
+  mutate(model_object_tidy = map(.x = model_object,
+                                 .f = ~tidy(conf.int = TRUE,
+                                           conf.level = 0.95,
+                                           x = .x)
+  )
+)
+gravier_clean_aug_long_nested
+
+```
+
+## Wrangling
+
+```{r}
+gravier_estimates <- gravier_clean_aug_long_nested |> 
+  unnest( model_object_tidy
+  )
+
+```
+
+```{r}
+gravier_estimates <- gravier_estimates|> 
+  filter(term == "early_metastasis") |> 
+  ungroup(genes)
+
+
+```
+
+```{r}
+gravier_estimates <- gravier_estimates |> 
+  mutate(
+    q.value = p.adjust(p.value),
+    is.significant = case_when(
+      p.value < 0.05 ~ "yes",
+      p.value >= 0.05 ~ "no"
+    )
+  )
+
+sample_n(gravier_estimates,10)
+
+```
+
+# PCA
+```{r}
+pca_fit <- gravier_estimates %>% 
+  select(where(is.numeric)) %>% # retain only numeric columns
+  prcomp(scale = TRUE) # do PCA on scaled data
+
+```
+
+```{r}
+pca_fit %>%
+  augment(gravier_estimates) %>% # add original dataset back in
+  ggplot(aes(.fittedPC1, .fittedPC2)) + 
+  geom_point(size = 1.5)
+```
+
+
+
+
+
