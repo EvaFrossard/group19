@@ -1,4 +1,9 @@
 .Rproj.user
 .Rhistory
 .RData
+<<<<<<< HEAD
 .Ruserdata
+=======
+.Ruserdata
+.gravier.RData
+>>>>>>> 456d6f7f62a1987da50878e71eb81dcec137b6bb

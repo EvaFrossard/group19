@@ -183,7 +183,7 @@ Variance_plot
 ```
 This plot shows that the first component of the PC explains 55.4% of the data variation.
 
-# Need to use patchwork at the end 
+# Need to use patchwork at the end to 
 ```{r}
 ```
 
