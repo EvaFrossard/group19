@@ -14,7 +14,7 @@ library(broom)
 # Load Data
 
 ```{r}
-raw_dir <- "/home/people/s231701/projects/r_for_bio_data_science/data/_raw/"
+raw_dir <- "/home/people/s231663/projects/lab07_git_exercises"
 data_file <- "gravier.RData"
 data_loc <- "https://github.com/ramhiser/datamicroarray/raw/master/data/"
 
@@ -40,7 +40,7 @@ gravier_clean <- gravier |>
 
 
 write_tsv(gravier_clean, 
-       file="/home/people/s231701/projects/r_for_bio_data_science/data/02_gravier_clean.tsv.gz"
+       file="/home/people/s231663/projects/lab07_git_exercises/02_gravier_clean.tsv.gz"
        )
 ```
 
@@ -55,7 +55,7 @@ gravier_clean_aug <- gravier_clean |>
 
 
 write_tsv(gravier_clean_aug, 
-       file="/home/people/s231701/projects/r_for_bio_data_science/data/03_gravier_clean_aug.tsv.gz"
+       file="/home/people/s231663/projects/lab07_git_exercises/03_gravier_clean_aug.tsv.gz"
        )
 ```
 
@@ -143,7 +143,7 @@ sample_n(gravier_estimates,10)
 
 ```
 
-# PCA
+# PCA analysis 
 ```{r}
 pca_fit <- gravier_estimates %>% 
   select(where(is.numeric)) %>% # retain only numeric columns
@@ -152,5 +152,39 @@ pca_fit <- gravier_estimates %>%
 ```
 
 
+
+
+
+##Variances plot as expained by each PC
+
+```{r}
+pca_fit %>%
+  tidy(matrix = "eigenvalues")
+```
+
+
+```{r}
+Variance_plot <- pca_fit |> 
+  tidy(matrix = "eigenvalues") |> 
+  ggplot(aes(PC, percent)) +
+  geom_col(fill = "#56B4E9", alpha = 0.8) +
+  scale_x_continuous(breaks = 1:9) +
+  scale_y_continuous(
+    labels = scales::percent_format(),
+    expand = expansion(mult = c(0, 0.01))
+  ) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    #panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank()
+  )
+Variance_plot
+```
+This plot shows that the first component of the PC explains 55.4% of the data variation.
+
+# Need to use patchwork at the end to 
+```{r}
+```
 
 
