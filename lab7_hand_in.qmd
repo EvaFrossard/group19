@@ -151,14 +151,6 @@ pca_fit <- gravier_estimates %>%
 
 ```
 
-```{r}
-pca_fit %>%
-  augment(gravier_estimates) %>% # add original dataset back in
-  ggplot(aes(.fittedPC1, .fittedPC2)) + 
-  geom_point(size = 1.5)
-```
-
-
 
 
 
