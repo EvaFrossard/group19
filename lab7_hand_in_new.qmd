@@ -15,7 +15,7 @@ library(broom)
 # Load Data
 
 ```{r}
-raw_dir <- "/home/people/s231663/projects/lab07_git_exercises"
+raw_dir <- "/home/projects/lab07_git_exercises"
 data_file <- "gravier.RData"
 data_loc <- "https://github.com/ramhiser/datamicroarray/raw/master/data/"
 
@@ -41,7 +41,7 @@ gravier_clean <- gravier |>
 
 
 write_tsv(gravier_clean, 
-       file="/home/people/s231663/projects/lab07_git_exercises/02_gravier_clean.tsv.gz"
+       file="/home/projects/lab07_git_exercises/02_gravier_clean.tsv.gz"
        )
 ```
 
@@ -70,11 +70,11 @@ pca_fit
 
 ```{r}
 pca_fit |> 
-  augment(gravier_estimates) |> 
+  augment(gravier_clean_aug) |> 
   ggplot(aes(.fittedPC1, .fittedPC2, color = early_metastasis)) + 
   geom_point(size = 1.5) +
   scale_color_manual(
-    values = c(malignant = "pink", benign = "darkblue")
+    values = c(good = "pink", poor = "darkblue")
   ) 
 
 ```
