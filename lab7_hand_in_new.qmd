@@ -1,0 +1,87 @@
+---
+title: "lab06_exercises"
+author: "Eva Frossard"
+format: html
+editor: visual
+---
+# Load libraries
+
+```{r}
+library(tidyverse)
+library(broom)
+```
+
+# Load Data
+
+```{r}
+raw_dir <- "/home/people/s231663/projects/lab07_git_exercises"
+data_file <- "gravier.RData"
+data_loc <- "https://github.com/ramhiser/datamicroarray/raw/master/data/"
+
+if( !dir.exists(raw_dir) ){
+  dir.create(path = raw_dir)
+}
+if( !file.exists(str_c(raw_dir, data_file)) ){
+  download.file(
+    url = str_c(data_loc, data_file),
+    destfile = str_c(raw_dir, data_file))
+}
+load(file = str_c(raw_dir, data_file))
+```
+
+
+# Tidy the data
+## Clean Data
+
+```{r}
+gravier_clean <- gravier |>
+  bind_cols() |> # binds the two dataframes by columns
+  as_tibble()
+
+
+write_tsv(gravier_clean, 
+       file="/home/people/s231663/projects/lab07_git_exercises/02_gravier_clean.tsv.gz"
+       )
+```
+
+```{r}
+gravier_clean
+```
+
+```{r}
+gravier_clean_aug <- gravier_clean |>
+  relocate(early_metastasis = y)
+
+gravier_clean_aug
+```
+
+# PCA analysis 
+```{r}
+pca_fit <- gravier_clean_aug |> 
+  select(where(is.numeric)) |> 
+  prcomp(scale = TRUE)
+
+```
+
+
+# Scatter plot
+
+
+# Rotation matrix 
+
+# Variance explained by each PC
+
+```{r}
+pca_fit |> 
+  tidy(matrix = "eigenvalues") |> 
+  ggplot(aes(PC, percent)) +
+  geom_col(fill = "#56B4E9", alpha = 0.8) +
+  scale_x_continuous(breaks = 1:9) +
+  scale_y_continuous(
+    labels = scales::percent_format(),
+    expand = expansion(mult = c(0, 0.01))
+  )
+```
+
+
+
