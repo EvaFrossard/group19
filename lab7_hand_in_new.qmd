@@ -46,14 +46,8 @@ write_tsv(gravier_clean,
 ```
 
 ```{r}
-gravier_clean
-```
-
-```{r}
 gravier_clean_aug <- gravier_clean |>
   relocate(early_metastasis = y)
-
-gravier_clean_aug
 ```
 
 # PCA analysis
@@ -62,8 +56,6 @@ gravier_clean_aug
 pca_fit <- gravier_clean_aug |> 
   select(where(is.numeric)) |> 
   prcomp(scale = TRUE)
-
-pca_fit
 ```
 
 # Scatter plot
@@ -84,6 +76,10 @@ The PC coordinates are combined with the gravier_clean_aug data set. The categor
 # Rotation matrix
 
 ```{r}
+arrow_style <- arrow(
+  angle = 20, ends = "first", type = "closed", length = grid::unit(8, "pt")
+)
+
 # plot rotation matrix
 pca_fit |> 
   tidy(matrix = "rotation") |> 
@@ -120,4 +116,4 @@ pca_fit |>
   
 ```
 
-PC1 explains 8.2% of the data which is quite low however, seeing the important number of PC, it still seems significative
+PC1 explains 8.2% of the data which is quite low however, seeing the important number of PC, it still seems quite significative
