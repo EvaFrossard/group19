@@ -7,14 +7,14 @@ editor: visual
 
 # Load libraries
 
-```{r}
+{r}
 library(tidyverse)
 library(broom)
-```
+
 
 # Load Data
 
-```{r}
+{r}
 raw_dir <- "/home/projects/lab07_git_exercises"
 data_file <- "gravier.RData"
 data_loc <- "https://github.com/ramhiser/datamicroarray/raw/master/data/"
@@ -28,13 +28,11 @@ if( !file.exists(str_c(raw_dir, data_file)) ){
     destfile = str_c(raw_dir, data_file))
 }
 load(file = str_c(raw_dir, data_file))
-```
+
 
 # Tidy the data
 
-## Clean Data
-
-```{r}
+{r}
 gravier_clean <- gravier |>
   bind_cols() |> # binds the two dataframes by columns
   as_tibble()
@@ -43,24 +41,24 @@ gravier_clean <- gravier |>
 write_tsv(gravier_clean, 
        file="/home/projects/lab07_git_exercises/02_gravier_clean.tsv.gz"
        )
-```
 
-```{r}
+
+{r}
 gravier_clean_aug <- gravier_clean |>
   relocate(early_metastasis = y)
-```
+
 
 # PCA analysis
 
-```{r}
+{r}
 pca_fit <- gravier_clean_aug |> 
   select(where(is.numeric)) |> 
   prcomp(scale = TRUE)
-```
+
 
 # Scatter plot
 
-```{r}
+{r}
 pca_fit |> 
   augment(gravier_clean_aug) |> 
   ggplot(aes(.fittedPC1, .fittedPC2, color = early_metastasis)) + 
@@ -69,13 +67,13 @@ pca_fit |>
     values = c(good = "pink", poor = "darkblue")
   ) 
 
-```
 
-The PC coordinates are combined with the gravier_clean_aug data set. The categorical variable early_metastasis is colored. On the y-axis the fittedPC variable is 2 and on the x-axis the fitted PC variable is 1. The interpretation of the PC variables is complicated when using categorical variables and only patterns can be recognized. There is no pattern discernible in this scatterplot. Further consideration of the data is necessary
+
+The PC coordinates are combined with the gravier_clean_aug data set. The categorical variable early_metastasis is colored. On the y-axis the fittedPC variable is 2 and on the x-axis the fitted PC variable is 1. The interpretation of the PC variables is complicated when using categorical variables. There is no pattern and no clusters discernible in this scatterplot. Further consideration of the data is necessary. 
 
 # Rotation matrix
 
-```{r}
+{r}
 arrow_style <- arrow(
   angle = 20, ends = "first", type = "closed", length = grid::unit(8, "pt")
 )
@@ -94,11 +92,13 @@ pca_fit |>
   ) +
   xlim(-0.05, 0.06) + ylim(-0.05, 0.05) +
   coord_fixed()
-```
+
+To be able to trace a discernible plot, we chose only 10 genes. The longer the vectors, the more they have an influence on the dataset. Here, g7F07 seem to be the more significant, however without a strong influence. Once again this plot doesn't seem very useful to exploit the data. 
+
 
 # Variance explained by each PC
 
-```{r}
+{r}
 pca_fit |> 
   tidy(matrix = "eigenvalues") |> 
   ggplot(aes(PC, percent)) +
@@ -114,6 +114,10 @@ pca_fit |>
     panel.grid.minor.y = element_blank()
   )
   
-```
 
-PC1 explains 8.2% of the data which is quite low however, seeing the important number of PC, it still seems quite significative
+
+PC1 explains 8.2% of the data which is may seem low. However, seeing the important number of PC, it still seems quite significant. It is followed upclose by PC2 which seems to explain 7%. 
+
+# Conclusion 
+
+On the contrary to the analysis using Purr performed two weeks ago, we have here an analysis using PC that doesn't seem too conclusive. This doesn't mean that some genes don't have influence on the presence of early metastasis, however it means that this model is not adequate to outline this relationship in particular.
