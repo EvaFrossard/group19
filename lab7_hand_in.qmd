@@ -55,8 +55,9 @@ gravier_clean_aug <- gravier_clean |>
 
 
 write_tsv(gravier_clean_aug, 
-       file="/home/people/s231663/projects/lab07_git_exercises/03_gravier_clean_aug.tsv.gz"
-       )
+       file="/home/people/s231663/projects/lab07_git_exercises/03_gravier_clean_aug.tsv.gz")
+
+gravier_clean_aug
 ```
 
 ## Analysis
@@ -65,7 +66,6 @@ write_tsv(gravier_clean_aug,
 ```{r}
 my_first_model <- lm(formula = g1A01 ~ early_metastasis,
    data = gravier_clean_aug)
-
 
 ```
 
@@ -79,6 +79,12 @@ gravier_clean_aug_long <- gravier_clean_aug |>
   )
 
 ```
+
+```{r}
+gravier_clean_aug_long
+```
+
+
 ```{r}
 gravier_clean_aug_long_nested <- gravier_clean_aug_long |> 
   group_by(genes) |> 
@@ -141,6 +147,8 @@ gravier_estimates <- gravier_estimates |>
 
 sample_n(gravier_estimates,10)
 
+gravier_estimates
+
 ```
 
 # PCA analysis 
@@ -150,6 +158,43 @@ pca_fit <- gravier_estimates %>%
   prcomp(scale = TRUE) # do PCA on scaled data
 
 ```
+
+## Scatter plot
+
+```{r}
+pca_fit %>%
+  augment(gravier_estimates) %>% 
+  ggplot(aes(.fittedPC1, .fittedPC2, color = is.significant)) + 
+  geom_point(size = 1.5) +
+  scale_color_manual(
+    values = c(no = "#D55E00", yes = "#0072B2")
+  ) 
+  #theme_half_open(12) + background_grid()
+```
+
+## Rotation matrix 
+
+```{r}
+arrow_style <- arrow(
+  angle = 20, ends = "first", type = "closed", length = grid::unit(8, "pt")
+)
+
+
+pca_fit |>
+  tidy(matrix = "rotation") |>
+  pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") |>
+  ggplot(aes(PC1, PC2)) +
+  geom_segment(xend = 0, yend = 0, arrow = arrow_style) +
+  geom_text(
+    aes(label = column),
+    hjust = 1, nudge_x = -0.02, 
+    color = "#904C2F"
+  ) +
+  xlim(-1.25, .5) + ylim(-.5, 1) +
+  coord_fixed()
+```
+
+
 
 
 
@@ -188,3 +233,25 @@ This plot shows that the first component of the PC explains 55.4% of the data va
 ```
 
 
+
+```{r}
+# define arrow style for plotting
+arrow_style <- arrow(
+  angle = 20, ends = "first", type = "closed", length = grid::unit(8, "pt")
+)
+
+# plot rotation matrix
+pca_fit |> 
+  tidy(matrix = "rotation") |> 
+  pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") |> 
+  head(10) |> 
+  ggplot(aes(PC1, PC2)) +
+  geom_segment(xend = 0, yend = 0, arrow = arrow_style) +
+  geom_text(
+    aes(label = column),
+    hjust = 1, nudge_x = +0.01, 
+    color = "#904C2F"
+  ) +
+  xlim(-0.05, 0.06) + ylim(-0.05, 0.05) +
+  coord_fixed()
+```
