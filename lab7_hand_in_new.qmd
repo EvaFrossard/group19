@@ -4,6 +4,7 @@ author: "Eva Frossard"
 format: html
 editor: visual
 ---
+
 # Load libraries
 
 ```{r}
@@ -14,7 +15,7 @@ library(broom)
 # Load Data
 
 ```{r}
-raw_dir <- "/home/people/s231663/projects/lab07_git_exercises"
+raw_dir <- "/home/projects/lab07_git_exercises"
 data_file <- "gravier.RData"
 data_loc <- "https://github.com/ramhiser/datamicroarray/raw/master/data/"
 
@@ -29,8 +30,8 @@ if( !file.exists(str_c(raw_dir, data_file)) ){
 load(file = str_c(raw_dir, data_file))
 ```
 
-
 # Tidy the data
+
 ## Clean Data
 
 ```{r}
@@ -40,7 +41,7 @@ gravier_clean <- gravier |>
 
 
 write_tsv(gravier_clean, 
-       file="/home/people/s231663/projects/lab07_git_exercises/02_gravier_clean.tsv.gz"
+       file="/home/projects/lab07_git_exercises/02_gravier_clean.tsv.gz"
        )
 ```
 
@@ -55,7 +56,8 @@ gravier_clean_aug <- gravier_clean |>
 gravier_clean_aug
 ```
 
-# PCA analysis 
+# PCA analysis
+
 ```{r}
 pca_fit <- gravier_clean_aug |> 
   select(where(is.numeric)) |> 
@@ -64,11 +66,22 @@ pca_fit <- gravier_clean_aug |>
 pca_fit
 ```
 
-
 # Scatter plot
 
+```{r}
+pca_fit |> 
+  augment(gravier_clean_aug) |> 
+  ggplot(aes(.fittedPC1, .fittedPC2, color = early_metastasis)) + 
+  geom_point(size = 1.5) +
+  scale_color_manual(
+    values = c(good = "pink", poor = "darkblue")
+  ) 
 
-# Rotation matrix 
+```
+
+The PC coordinates are combined with the gravier_clean_aug data set. The categorical variable early_metastasis is colored. On the y-axis the fittedPC variable is 2 and on the x-axis the fitted PC variable is 1. The interpretation of the PC variables is complicated when using categorical variables and only patterns can be recognized. There is no pattern discernible in this scatterplot. Further consideration of the data is necessary
+
+# Rotation matrix
 
 ```{r}
 # plot rotation matrix
@@ -86,7 +99,6 @@ pca_fit |>
   xlim(-0.05, 0.06) + ylim(-0.05, 0.05) +
   coord_fixed()
 ```
-
 
 # Variance explained by each PC
 
@@ -109,4 +121,3 @@ pca_fit |>
 ```
 
 PC1 explains 8.2% of the data which is quite low however, seeing the important number of PC, it still seems significative
-
